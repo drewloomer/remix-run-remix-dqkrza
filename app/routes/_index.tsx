@@ -1,41 +1,26 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { json, useLoaderData } from '@remix-run/react';
+import { Markdown } from '~/components';
+import { getFileContentWithCache } from '~/services/github.server';
+import { parse } from '~/services/markdoc.server';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
-};
+export async function loader({ context }: LoaderFunctionArgs) {
+	const content = await getFileContentWithCache(context, 'README.md');
+
+	return json(
+		{
+			content: parse(content),
+		},
+		{
+			headers: {
+				'Cache-Control': 'public, max-age=3600',
+			},
+		},
+	);
+}
 
 export default function Index() {
-  return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
+	const { content } = useLoaderData<typeof loader>();
+
+	return <Markdown content={content} />;
 }

@@ -1,4 +1,4 @@
-name = "dashboard"
+name = "remix-cloudflare-template"
 compatibility_date = "2024-02-11"
 kv_namespaces = [
   { binding = "cache", id = "cache" }
@@ -6,5 +6,9 @@ kv_namespaces = [
 
 [dev]
 ip = "0.0.0.0"
-port = 5173
+port = 3207
 local_protocol = "http"
+
+[vars]
+GITHUB_OWNER = "edmundhung"
+GITHUB_REPO = "remix-cloudflare-template"
